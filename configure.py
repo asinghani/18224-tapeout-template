@@ -40,51 +40,29 @@ def fetch_file(url, filename):
 
 
 def get_project_source(yaml):
-    # wokwi_id must be an int or 0
-    try:
-        wokwi_id = int(yaml['project']['wokwi_id'])
-    except ValueError:
-        logging.error("wokwi id must be an integer")
+    if 'source_files' not in yaml['project']:
+        logging.error("source files must be provided")
         exit(1)
 
-    # it's a wokwi project
-    if wokwi_id != 0:
-        url = "https://wokwi.com/api/projects/{}/verilog".format(wokwi_id)
-        src_file = "user_module_{}.v".format(wokwi_id)
-        fetch_file(url, os.path.join("src", src_file))
+    source_files = yaml['project']['source_files']
+    if source_files is None:
+        logging.error("must be more than 1 source file")
+        exit(1)
 
-        # also fetch the wokwi diagram
-        url = "https://wokwi.com/api/projects/{}/diagram.json".format(wokwi_id)
-        diagram_file = "wokwi_diagram.json"
-        fetch_file(url, os.path.join("src", diagram_file))
+    if len(source_files) == 0:
+        logging.error("must be more than 1 source file")
+        exit(1)
 
-        return [src_file, 'cells.v']
+    if 'top_module' not in yaml['project']:
+        logging.error("must provide a top module name")
+        exit(1)
 
-    # else it's HDL, so check source files
-    else:
-        if 'source_files' not in yaml['project']:
-            logging.error("source files must be provided if wokwi_id is set to 0")
+    for filename in source_files:
+        if not os.path.exists(os.path.join('src', filename)):
+            logging.error(f"{filename} doesn't exist in the repo")
             exit(1)
 
-        source_files = yaml['project']['source_files']
-        if source_files is None:
-            logging.error("must be more than 1 source file")
-            exit(1)
-
-        if len(source_files) == 0:
-            logging.error("must be more than 1 source file")
-            exit(1)
-
-        if 'top_module' not in yaml['project']:
-            logging.error("must provide a top module name")
-            exit(1)
-
-        for filename in source_files:
-            if not os.path.exists(os.path.join('src', filename)):
-                logging.error(f"{filename} doesn't exist in the repo")
-                exit(1)
-
-        return source_files
+    return source_files
 
 
 # documentation
@@ -139,11 +117,7 @@ def build_pdf(yaml_data):
 
 
 def get_top_module(yaml):
-    wokwi_id = int(yaml['project']['wokwi_id'])
-    if wokwi_id != 0:
-        return "user_module_{}".format(wokwi_id)
-    else:
-        return yaml['project']['top_module']
+    return yaml['project']['top_module']
 
 
 def get_stats():
