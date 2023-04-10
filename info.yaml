@@ -1,9 +1,11 @@
 --- 
 project:
   source_files:
+    - toplevel_chip.v
+    - chip.sv
     - counter.v
     - decoder.v
-  top_module:  "seven_segment_seconds"
+  top_module:  "toplevel_chip"
 
 # As everyone will have access to all designs, try to make it easy for someone new to your design to know what
 # it does and how to operate it.
