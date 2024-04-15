@@ -8,7 +8,8 @@ module my_chip (
 );
     
     // Basic counter design as an example
-
+    // TODO: remove the counter design and use this module to insert your own design
+    // DO NOT change the I/O header of this design
 
     wire [6:0] led_out;
     assign io_out[6:0] = led_out;
